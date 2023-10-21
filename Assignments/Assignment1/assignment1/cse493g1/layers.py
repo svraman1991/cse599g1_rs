@@ -27,8 +27,11 @@ def affine_forward(x, w, b):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    # Reshape the x input and calculate the output
+    N = x.shape[0]
+    reshaped_x = x.reshape(N, -1)
 
+    out = np.dot(reshaped_x, w) + b
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
     #                             END OF YOUR CODE                            #
@@ -60,7 +63,14 @@ def affine_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    N = x.shape[0]
+    D = w.shape[0]
+    # M = w.shape[1]
+
+    # Calculate the gradients
+    dx = np.dot(dout, w.T).reshape(x.shape)
+    dw = np.dot(x.reshape(N, D).T, dout)
+    db = np.sum(dout, axis=0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -86,7 +96,7 @@ def relu_forward(x):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    out = np.maximum(0, x)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -113,7 +123,7 @@ def relu_backward(dout, cache):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    dx = dout * (x > 0)
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -772,7 +782,30 @@ def svm_loss(x, y):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = x.shape[0]
+    scores = x
+    correct_scores = scores[np.arange(num_train), y]
+
+    svm_margins =  scores - correct_scores[:, np.newaxis] + 1
+    # svm_margins = scores - correct_scores[:, np.newaxis] + 1
+    svm_margins[np.arange(num_train), y] = 0
+
+    loss = np.sum(np.maximum(0,svm_margins)) / num_train
+    # Add regularization to the loss.
+
+    #svm_loss += 0.5 * 5.000000e+04 * np.sum(W * W)
+
+    #svm_loss += reg * np.sum(W * W)
+
+    margins_bool = (svm_margins > 0).astype(int)
+    rowsum = np.sum(margins_bool, axis=1)
+    margins_bool[np.arange(num_train), y] = -rowsum
+
+    # dx = np.dot(margins_bool, np.ones((x.shape[0], 1)))/num_train
+    #dx = np.dot(margins_bool.T, np.ones(num_train))/num_train
+
+    dx = margins_bool / num_train
+    #dW += reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################

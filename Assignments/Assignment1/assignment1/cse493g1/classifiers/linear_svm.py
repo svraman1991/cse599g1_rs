@@ -95,10 +95,13 @@ def svm_loss_vectorized(W, X, y, reg):
     svm_margins[np.arange(num_train), y] = 0
 
     svm_loss = np.sum(svm_margins)/num_train
-
     # Add regularization to the loss.
 
     svm_loss += 0.5 * reg * np.sum(W * W)
+
+    #svm_loss += reg * np.sum(W * W)
+
+    loss = svm_loss
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
@@ -118,7 +121,7 @@ def svm_loss_vectorized(W, X, y, reg):
     margins_bool[np.arange(num_train), y] = -rowsum
 
     dW = np.dot(X.T, margins_bool)/num_train
-    dW += 2 * reg * W
+    dW += reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
