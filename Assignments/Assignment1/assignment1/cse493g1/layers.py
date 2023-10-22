@@ -786,26 +786,26 @@ def svm_loss(x, y):
     scores = x
     correct_scores = scores[np.arange(num_train), y]
 
-    svm_margins =  scores - correct_scores[:, np.newaxis] + 1
+    svm_margins = scores - correct_scores[:, np.newaxis] + 1
     # svm_margins = scores - correct_scores[:, np.newaxis] + 1
     svm_margins[np.arange(num_train), y] = 0
 
-    loss = np.sum(np.maximum(0,svm_margins)) / num_train
+    loss = np.sum(np.maximum(0, svm_margins)) / num_train
     # Add regularization to the loss.
 
-    #svm_loss += 0.5 * 5.000000e+04 * np.sum(W * W)
+    # svm_loss += 0.5 * 5.000000e+04 * np.sum(W * W)
 
-    #svm_loss += reg * np.sum(W * W)
+    # svm_loss += reg * np.sum(W * W)
 
     margins_bool = (svm_margins > 0).astype(int)
     rowsum = np.sum(margins_bool, axis=1)
     margins_bool[np.arange(num_train), y] = -rowsum
 
     # dx = np.dot(margins_bool, np.ones((x.shape[0], 1)))/num_train
-    #dx = np.dot(margins_bool.T, np.ones(num_train))/num_train
+    # dx = np.dot(margins_bool.T, np.ones(num_train))/num_train
 
     dx = margins_bool / num_train
-    #dW += reg * W
+    # dW += reg * W
 
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
@@ -835,8 +835,25 @@ def softmax_loss(x, y):
     ###########################################################################
     # *****START OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
 
-    pass
+    num_train = x.shape[0]
+    scores = x
+    exp_scores = np.exp(scores)
 
+    softmax_probabilities = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+    # print('softmax_probabilities shape', softmax_probabilities.shape)
+    loss = -np.sum(np.log(softmax_probabilities[np.arange(num_train), y])) / num_train
+
+    dS = softmax_probabilities.copy()
+    dS[np.arange(num_train), y] -= 1
+    # print('dS shape after arange', dS.shape)
+    # print('x.T shape ', x.T.shape)
+    # dx = np.dot(x.T, dS) / num_train
+    dx = dS / num_train
+    # dx = np.dot(x.T, dS) / num_train + reg * W
+
+    # loss += 0.5 * np.sum(x*x)
+    # dx += reg * x
+    # dx += x
     # *****END OF YOUR CODE (DO NOT DELETE/MODIFY THIS LINE)*****
     ###########################################################################
     #                             END OF YOUR CODE                            #
